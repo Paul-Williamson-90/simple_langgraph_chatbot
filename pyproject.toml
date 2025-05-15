@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "Paul Williamson",email = "paulw.900430@gmail.com"}
 ]
-readme = "README.md"
+readme = "readme.md"
 requires-python = ">=3.12,<4.0"
 dependencies = [
     "langgraph-cli[inmem] (>=0.2.10,<0.3.0)",
