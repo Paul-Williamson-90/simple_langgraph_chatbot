@@ -48,3 +48,19 @@ http://localhost:8123/
 ```
 
 5. Now you can test your deployment and see the agent working visually.
+
+## Optionally, use the Makefile
+1. Start the agent:
+```bash
+make agent_start
+```
+
+2. Stop the agent:
+```bash
+make agent_stop
+```
+
+3. Restart the agent:
+```bash
+make agent_restart
+```

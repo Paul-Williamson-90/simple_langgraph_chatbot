@@ -3,7 +3,7 @@ agent_start:
 	sleep 5
 	docker compose up --build -d
 
-agent_down:
+agent_stop:
 	docker compose down
 
 agent_restart:
