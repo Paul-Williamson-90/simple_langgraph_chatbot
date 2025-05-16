@@ -28,7 +28,12 @@ poetry install
 ```
 
 # Running the Agent Container
-1. Run docker compose to build the containers
+1. Run the following to build the images:
+```bash
+langgraph build -t agent
+```
+
+2. Run docker compose to build the containers
 
 ```bash
 docker compose up --build -d
