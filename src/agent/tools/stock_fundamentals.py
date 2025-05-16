@@ -4,7 +4,7 @@ import yfinance as yf
 from langchain_core.tools import tool
 
 
-@tool("fetch_stock_fundamentals", parse_docstring=True)
+@tool("fetch_stock_fundamentals")
 def fetch_stock_fundamentals(symbol: str) -> dict[str, Any]:
     """Fetch stock fundamentals for a given symbol.
 

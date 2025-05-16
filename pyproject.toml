@@ -13,7 +13,9 @@ dependencies = [
     "langchain-tavily (>=0.1.6,<0.2.0)",
     "langchain-openai (>=0.3.17,<0.4.0)",
     "yfinance (>=0.2.38,<0.3.0)",
-    "pydantic (>=2.11.4,<3.0.0)"
+    "pydantic (>=2.11.4,<3.0.0)",
+    "bbc-news (>=1.0.2,<2.0.0)",
+    "bs4 (>=0.0.2,<0.0.3)"
 ]
 
 [tool.poetry]

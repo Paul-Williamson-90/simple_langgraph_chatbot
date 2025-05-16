@@ -185,6 +185,21 @@ tests = ["cloudpickle ; platform_python_implementation == \"CPython\"", "hypothe
 tests-mypy = ["mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\""]
 
 [[package]]
+name = "bbc-news"
+version = "1.0.2"
+description = "A simple and yet easy-to-use API for BBC News"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "bbc_news-1.0.2-py3-none-any.whl", hash = "sha256:30e817ee5f129b162cd5936aa7d9f5e00aff1456007ccf7ef6fbfb3a5dc29222"},
+    {file = "bbc_news-1.0.2.tar.gz", hash = "sha256:9635c4465dfedf7a4b22cb3a8efec7ef08ca4f8979bb2eb2e2a0bde5b868562e"},
+]
+
+[package.dependencies]
+requests = ">=2.28.2"
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.13.4"
 description = "Screen-scraping library"
@@ -221,6 +236,21 @@ files = [
 
 [package.dependencies]
 forbiddenfruit = {version = ">=0.1.4", markers = "implementation_name == \"cpython\""}
+
+[[package]]
+name = "bs4"
+version = "0.0.2"
+description = "Dummy package for Beautiful Soup (beautifulsoup4)"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "bs4-0.0.2-py2.py3-none-any.whl", hash = "sha256:abf8742c0805ef7f662dce4b51cca104cffe52b835238afc169142ab9b3fbccc"},
+    {file = "bs4-0.0.2.tar.gz", hash = "sha256:a48685c58f50fe127722417bae83fe6badf500d54b55f7e39ffe43b798653925"},
+]
+
+[package.dependencies]
+beautifulsoup4 = "*"
 
 [[package]]
 name = "certifi"
@@ -3330,4 +3360,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4.0"
-content-hash = "85c3faba042a2f2e913118e9bf58792948bba469c08ff7252b497e082d772106"
+content-hash = "7645088799643fec289e15ef59a6d592eb58083ebec22c959dcc88266e9aa61f"

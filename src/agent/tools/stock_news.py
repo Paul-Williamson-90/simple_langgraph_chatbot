@@ -8,11 +8,8 @@ from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter
 
+from src.agent.tools.constants import HEADERS
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-    "Accept-Language": "en-US,en;q=0.9",
-}
 
 REMOVALS = [
     "Oops, something went wrong"
@@ -63,7 +60,7 @@ class YFNewsArticle(BaseModel):
         }
         
     
-@tool("fetch_stock_related_news", parse_docstring=True)
+@tool("fetch_stock_related_news")
 def fetch_stock_related_news(symbol: str) -> dict[str, Any]:
     """Fetch latest news regarding a stock (from Yahoo!).
     Retrieves up to 10 news articles related to the stock symbol provided.
