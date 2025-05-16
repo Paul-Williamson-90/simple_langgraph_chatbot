@@ -2,6 +2,10 @@ from datetime import datetime
 
 from langchain.chat_models import init_chat_model
 from langgraph.graph import END, StateGraph
+from langchain_core.messages.utils import (
+    trim_messages,
+    count_tokens_approximately
+)
 
 from src.agent.state import State
 from src.agent.tools import agent_tool_kit, tool_node
@@ -16,9 +20,17 @@ async def call_model(state: State) -> dict:
     sys = system_prompt.format(
         time=datetime.now().isoformat()
     )
-
+    max_tokens = (llm.model_config.str_max_length or 128_000) - 1000
+    msgs = trim_messages(
+        state.messages,
+        strategy="last",
+        token_counter=count_tokens_approximately,
+        max_tokens=max_tokens,
+        start_on="human",
+        include_system=True,
+    )
     msg = await llm_with_tools.ainvoke(
-        [{"role": "system", "content": sys}, *state.messages],
+        [{"role": "system", "content": sys}, *msgs],
     )
     return {"messages": [msg]}
 
