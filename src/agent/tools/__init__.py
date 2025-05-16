@@ -1,5 +1,5 @@
-from src.tools.web_search import web_search_tool
-from src.tools.tool_node import BasicToolNode
+from src.agent.tools.web_search import web_search_tool
+from src.agent.tools.tool_node import BasicToolNode
 
 
 agent_tool_kit = [

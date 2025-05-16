@@ -3,7 +3,7 @@ import json
 from langchain_core.messages import ToolMessage
 from langchain_core.tools import BaseTool
 
-from src.state import State
+from src.agent.state import State
 
 
 class BasicToolNode:
