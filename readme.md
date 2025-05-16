@@ -21,7 +21,21 @@ poetry shell
 poetry install
 ```
 
-3. Run the agent on a local server via the LangGraph Platform
+# Running the Agent
+You have two choices (based on a free LangSmith plan)
+
+1. One is to enter dev mode (local server):
+
 ```bash
 langgraph dev
 ```
+
+This will provide access to the LangGraph studio to play with your agent and see a pretty diagram of the architecture.
+
+2. Deploy the agent locally via docker as a containerised application:
+
+```bash
+langgraph up
+```
+
+This provides the same as langgraph dev in addition to seeing a redis and postgres container booted up.
