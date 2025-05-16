@@ -9,6 +9,12 @@
 LANGSMITH_API_KEY=...
 OPENAI_API_KEY=...
 TAVILY_API_KEY=...
+
+POSTGRES_DB=postgres # change this to whatever
+POSTGRES_USER=postgres # change this to whatever
+POSTGRES_PASSWORD=postgres # change this to whatever
+
+IMAGE_NAME=agent # change this to whatever
 ```
 
 *Note that you can get a Tavily API key for free usage (limited 'Researcher' tier)*
@@ -21,21 +27,19 @@ poetry shell
 poetry install
 ```
 
-# Running the Agent
-You have two choices (based on a free LangSmith plan)
-
-1. One is to enter dev mode (local server):
+# Running the Agent Container
+1. Run docker compose to build the containers
 
 ```bash
-langgraph dev
+docker compose up --build -d
 ```
 
-This will provide access to the LangGraph studio to play with your agent and see a pretty diagram of the architecture.
+2. Access the LangGraph/LangSmith platform via a web browser [LangSmith](https://smith.langchain.com/)
+3. Click 'Deployments' in the left hand menu 
+4. In the top right corner click LangGraph Studio and enter:
 
-2. Deploy the agent locally via docker as a containerised application:
-
-```bash
-langgraph up
+```
+http://localhost:8123/
 ```
 
-This provides the same as langgraph dev in addition to seeing a redis and postgres container booted up.
+5. Now you can test your deployment and see the agent working visually.
