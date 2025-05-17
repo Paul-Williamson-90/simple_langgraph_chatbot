@@ -5,7 +5,7 @@ import bbc
 from bs4 import BeautifulSoup
 from langchain_core.tools import tool
 
-from src.agent.tools.constants import HEADERS
+from src.tools.constants import HEADERS
 
 
 NewsCategories = Literal[

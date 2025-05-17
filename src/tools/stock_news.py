@@ -8,7 +8,7 @@ from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter
 
-from src.agent.tools.constants import HEADERS
+from src.tools.constants import HEADERS
 
 
 REMOVALS = [

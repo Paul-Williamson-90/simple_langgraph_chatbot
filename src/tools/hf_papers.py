@@ -6,8 +6,8 @@ import requests
 from bs4 import BeautifulSoup
 from langchain_core.tools import tool
 
-from src.agent.tools.utils import RateLimitCounter
-from src.agent.tools.constants import HEADERS
+from src.tools.utils import RateLimitCounter
+from src.tools.constants import HEADERS
 
 
 def _create_url() -> str:
