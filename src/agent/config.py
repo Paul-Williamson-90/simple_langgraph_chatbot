@@ -10,6 +10,7 @@ class Configuration:
     model: str = "gpt-4o"
     model_provider: str = "openai"
     deep_research: bool = False
+    max_research_iterations: int = 5
     
     @classmethod
     def from_runnable_config(cls, config: Optional[RunnableConfig] = None) -> "Configuration":

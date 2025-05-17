@@ -10,7 +10,8 @@ services:
             timeout: 1s
             retries: 5
     langgraph-postgres:
-        image: postgres:16
+        # image: postgres:16
+        image: ankane/pgvector:latest
         ports:
             - "5433:5432"
         environment:
@@ -18,7 +19,7 @@ services:
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         volumes:
-            - langgraph-data:/var/lib/postgresql/data
+            - ./data/pgvector:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
             start_period: 10s
