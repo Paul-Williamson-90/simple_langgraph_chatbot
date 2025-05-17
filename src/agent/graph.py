@@ -3,22 +3,25 @@ from typing import Optional
 
 from pydantic import BaseModel
 from langchain.chat_models import init_chat_model
+from langchain_core.language_models import BaseChatModel
 from langgraph.graph import END, StateGraph
+from langchain_core.runnables import RunnableConfig
 from langchain_core.messages.utils import (
     trim_messages,
     count_tokens_approximately
 )
 
 from src.agent.state import State
-from src.tools import agent_tool_kit, tool_node
+from src.tools import agent_tool_kit
+from src.agent.tool_node import BasicToolNode
 from src.agent.prompts import system_prompt
+from src.agent.config import Configuration
 
 
-llm = init_chat_model("gpt-4o", model_provider="openai")
-llm_with_tools = llm.bind_tools(agent_tool_kit)
+tool_node = BasicToolNode(agent_tool_kit)
 
 
-def model_max_tokens() -> Optional[int]:
+def model_max_tokens(llm: BaseChatModel) -> Optional[int]:
     config = llm.model_config
     if isinstance(config, BaseModel):
         config_dict = config.model_dump()
@@ -33,11 +36,18 @@ def model_max_tokens() -> Optional[int]:
             
 
 
-async def call_model(state: State) -> dict:
+async def call_model(state: State, config: RunnableConfig) -> dict:
+    configuration = Configuration.from_runnable_config(config)
+    llm = init_chat_model(
+        model=configuration.model, 
+        model_provider=configuration.model_provider
+    )
+    llm_with_tools = llm.bind_tools(agent_tool_kit)
+    
     sys = system_prompt.format(
         time=datetime.now().isoformat()
     )
-    max_tokens = (model_max_tokens() or 128_000) - 1000
+    max_tokens = (model_max_tokens(llm) or 128_000) - 1000
     msgs = trim_messages(
         state.messages,
         strategy="last",
@@ -59,7 +69,7 @@ def route_message(state: State):
     return END
 
 
-graph_builder = StateGraph(State)
+graph_builder = StateGraph(State, config_schema=Configuration)
 
 graph_builder.add_node("call_model", call_model)
 graph_builder.add_node("tools", tool_node)

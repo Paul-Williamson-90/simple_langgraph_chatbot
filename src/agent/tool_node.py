@@ -2,6 +2,7 @@ import json
 
 from langchain_core.messages import ToolMessage
 from langchain_core.tools import BaseTool
+from langchain_core.runnables import RunnableConfig
 
 from src.agent.state import State
 
@@ -12,7 +13,7 @@ class BasicToolNode:
     def __init__(self, tools: list[BaseTool]) -> None:
         self.tools_by_name = {tool.name: tool for tool in tools}
 
-    def __call__(self, inputs: State):
+    def __call__(self, inputs: State, config: RunnableConfig):
         if messages := inputs.messages:
             message = messages[-1]
         else:
