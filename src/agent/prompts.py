@@ -70,7 +70,8 @@ report_conclusion_instructions = (
     + "<task>\n"
     "You must write a conclusion section for the report based on the completed sections. "
     "The conclusion should highlight the key findings that directly address the research objectives, "
-    "and include any recommendations, implications, outstanding questions or concerns, and future directions.\n\n"
+    "and include any recommendations, implications, outstanding questions or concerns, and future directions. "
+    "The conclusion must be no more than 2 paragraphs long.\n\n"
     "Only write the conclusion section content text, do not include a title or sources.\n\n"
     "</task>"
 )
@@ -81,7 +82,8 @@ report_intro_instructions = (
     + "<task>\n"
     "You must write an introduction section for the report based on the completed sections. "
     "The introduction should provide an overview of the report, including the research objectives, "
-    "the main topics covered in the report, and the key findings that will be discussed in the report.\n\n"
+    "the main topics covered in the report, and the key findings that will be discussed in the report. "
+    "The introduction must be no more than 2 paragraphs long.\n\n"
     "Only write the introduction section content text, do not include a title or sources.\n\n"
     "</task>"
 )
