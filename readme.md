@@ -2,6 +2,7 @@
 - This project is an experiment using LangGraph and the new [LangGraph Platform](https://langchain-ai.github.io/langgraph/concepts/langgraph_platform/). 
 - Typically I use Llama-Index to build my agents but wanted to test myself and experience a different ecosystem.
 - The final code is a combination of the [agents tutorial](https://langchain-ai.github.io/langgraph/concepts/why-langgraph/) and the [LangGraph Platform Tutorial](https://langchain-ai.github.io/langgraph/tutorials/langgraph-platform/local-server/).
+- Additionally, I have added a 'deep research' option to the agent (triggered via the RunnableConfig).
 
 # Setup
 1. Create a .env file in the root with the following keys:
