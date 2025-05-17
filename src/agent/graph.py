@@ -1,5 +1,7 @@
 from datetime import datetime
+from typing import Optional
 
+from pydantic import BaseModel
 from langchain.chat_models import init_chat_model
 from langgraph.graph import END, StateGraph
 from langchain_core.messages.utils import (
@@ -16,11 +18,26 @@ llm = init_chat_model("gpt-4o", model_provider="openai")
 llm_with_tools = llm.bind_tools(agent_tool_kit)
 
 
+def model_max_tokens() -> Optional[int]:
+    config = llm.model_config
+    if isinstance(config, BaseModel):
+        config_dict = config.model_dump()
+    else:
+        config_dict = config
+    tokens = None
+    for key in ["max_tokens", "str_max_length"]:
+        tokens = config_dict.get(key, None)
+        if tokens:
+            break
+    return tokens
+            
+
+
 async def call_model(state: State) -> dict:
     sys = system_prompt.format(
         time=datetime.now().isoformat()
     )
-    max_tokens = (llm.model_config.str_max_length or 128_000) - 1000
+    max_tokens = (model_max_tokens() or 128_000) - 1000
     msgs = trim_messages(
         state.messages,
         strategy="last",
