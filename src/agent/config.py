@@ -9,6 +9,7 @@ from langchain_core.runnables import RunnableConfig
 class Configuration:
     model: str = "gpt-4o"
     model_provider: str = "openai"
+    deep_research: bool = False
     
     @classmethod
     def from_runnable_config(cls, config: Optional[RunnableConfig] = None) -> "Configuration":

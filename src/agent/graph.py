@@ -1,11 +1,13 @@
 from datetime import datetime
 from typing import Optional
+import json
 
 from pydantic import BaseModel
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
-from langgraph.graph import END, StateGraph
+from langgraph.graph import START, END, StateGraph
 from langchain_core.runnables import RunnableConfig
+from langchain_core.messages import ToolMessage
 from langchain_core.messages.utils import (
     trim_messages,
     count_tokens_approximately
@@ -13,12 +15,8 @@ from langchain_core.messages.utils import (
 
 from src.agent.state import State
 from src.tools import agent_tool_kit
-from src.agent.tool_node import BasicToolNode
 from src.agent.prompts import system_prompt
 from src.agent.config import Configuration
-
-
-tool_node = BasicToolNode(agent_tool_kit)
 
 
 def model_max_tokens(llm: BaseChatModel) -> Optional[int]:
@@ -69,18 +67,61 @@ def route_message(state: State):
     return END
 
 
+def route_start(state: State, config: RunnableConfig):
+    configuration = Configuration.from_runnable_config(config)
+    if configuration.deep_research is True:
+        raise NotImplementedError(
+            "Deep research is not implemented yet."
+        )
+    return "call_model"
+
+
+async def tool_node(state: State, config: RunnableConfig):
+    if messages := state.messages:
+        message = messages[-1]
+    else:
+        raise ValueError("No message found in input")
+    tools_by_name = {
+        tool.name: tool for tool in agent_tool_kit
+    }
+    outputs = []
+    for tool_call in message.tool_calls:
+        tool_result = tools_by_name[tool_call["name"]].invoke(
+            tool_call["args"]
+        )
+        outputs.append(
+            ToolMessage(
+                content=json.dumps(tool_result),
+                name=tool_call["name"],
+                tool_call_id=tool_call["id"],
+            )
+        )
+    return {"messages": outputs}
+
+
+async def generate_report_plan(state: State, config: RunnableConfig):
+    return 
+
+
 graph_builder = StateGraph(State, config_schema=Configuration)
 
 graph_builder.add_node("call_model", call_model)
 graph_builder.add_node("tools", tool_node)
+graph_builder.add_node("generate_report_plan", generate_report_plan)
 
-graph_builder.add_edge("__start__", "call_model")
+graph_builder.add_conditional_edges(
+    START,
+    route_start,
+    {"call_model": "call_model", "generate_report_plan": "generate_report_plan"}
+)
 graph_builder.add_conditional_edges(
     "call_model",
     route_message,
     {"tools": "tools", END: END}
 )
 graph_builder.add_edge("tools", "call_model")
+
+graph_builder.add_edge("generate_report_plan", END)
 
 graph = graph_builder.compile()
 graph.name = "Tool Agent"
