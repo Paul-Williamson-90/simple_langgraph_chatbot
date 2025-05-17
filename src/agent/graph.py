@@ -200,7 +200,7 @@ async def write_conclusion(state: State, config: RunnableConfig) -> dict:
         content=content.content,
         sources=[],
     )
-    return {"completed_sections": conclusion_section}
+    return {"completed_sections": [conclusion_section]}
 
 
 async def write_intro(state: State, config: RunnableConfig) -> dict:
@@ -226,7 +226,7 @@ async def write_intro(state: State, config: RunnableConfig) -> dict:
         content=content.content,
         sources=[],
     )
-    return {"completed_sections": intro_section}
+    return {"completed_sections": [intro_section]}
 
 
 async def compile_final_report(state: State, config: RunnableConfig) -> dict:
