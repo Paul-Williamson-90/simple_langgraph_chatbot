@@ -1,6 +1,5 @@
 import json
 from typing import Literal
-import logging
 
 from langgraph.graph import START, END, StateGraph
 from langchain_core.runnables import RunnableConfig
@@ -13,9 +12,6 @@ from src.tools import agent_tool_kit
 from src.agent.deep_research.pydantics import CompletedSection, Brief, Section
 from src.agent.config import Configuration
 from src.agent.deep_research.prompts import system_instruction
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 def brief_from_state(state: SectionState) -> str:
@@ -47,7 +43,7 @@ def _get_system_instruction(state: SectionState, current_step: str) -> str:
 
 async def reasoning_step(state: SectionState, config: RunnableConfig) -> dict:
     configuration = Configuration.from_runnable_config(config)
-    logger.info(str(state))
+    
     llm = init_chat_model(
         model=configuration.model, 
         model_provider=configuration.model_provider
