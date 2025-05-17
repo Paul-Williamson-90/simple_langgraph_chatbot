@@ -20,7 +20,8 @@ dependencies = [
 
 [tool.poetry]
 packages = [
-    { include = "src/agent" }
+    { include = "src/agent" },
+    { include = "src/tools" }
 ]
 
 
