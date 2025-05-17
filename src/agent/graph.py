@@ -198,6 +198,7 @@ async def write_conclusion(state: State, config: RunnableConfig) -> dict:
         section_index=section_index,
         section_title="Conclusion",
         content=content.content,
+        sources=[],
     )
     return {"completed_sections": conclusion_section}
 
@@ -223,6 +224,7 @@ async def write_intro(state: State, config: RunnableConfig) -> dict:
         section_index=section_index,
         section_title="Introduction",
         content=content.content,
+        sources=[],
     )
     return {"completed_sections": intro_section}
 

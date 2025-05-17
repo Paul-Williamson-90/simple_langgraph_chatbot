@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-import operator
 
 from langchain_core.messages import AnyMessage
 from langgraph.graph import add_messages
 from typing_extensions import Annotated
+from operator import add
 
 from src.agent.deep_research.pydantics import CompletedSection
 
@@ -14,7 +14,7 @@ class State:
 
     messages: Annotated[list[AnyMessage], add_messages]
     """The messages in the conversation."""
-    completed_sections: list[CompletedSection] = field(default_factory=list)
+    completed_sections: Annotated[list[CompletedSection], add] = field(default_factory=list)
     report_topic: str = ""
     report_high_level_objectives: str = ""
     

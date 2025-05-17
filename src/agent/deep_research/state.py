@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from langchain_core.messages import AnyMessage
 from langgraph.graph import add_messages
 from typing_extensions import Annotated
+from operator import add
 
 from src.agent.deep_research.pydantics import CompletedSection, Section
 
@@ -20,4 +21,4 @@ class SectionState:
     
 @dataclass(kw_only=True)
 class SectionOutputState:
-    completed_sections: list[CompletedSection] 
+    completed_sections: Annotated[list[CompletedSection], add]

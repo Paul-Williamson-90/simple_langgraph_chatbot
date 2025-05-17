@@ -7,7 +7,7 @@ from langchain_core.runnables import RunnableConfig
 
 @dataclass(kw_only=True)
 class Configuration:
-    model: str = "gpt-4o"
+    model: str = "gpt-4.1-mini"
     model_provider: str = "openai"
     deep_research: bool = False
     max_research_iterations: int = 5

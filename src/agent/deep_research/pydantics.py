@@ -25,7 +25,7 @@ class CompletedSection(BaseModel):
     section_index: int
     section_title: str
     content: str
-    sources: list[Source] = []
+    sources: list[Source]
 
     def __str__(self) -> str:
         text = (
