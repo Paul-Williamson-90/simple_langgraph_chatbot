@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 import json
 
 from pydantic import BaseModel
@@ -9,6 +9,7 @@ from langgraph.graph import START, END, StateGraph
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import ToolMessage, AIMessage
 from langgraph.constants import Send
+from langgraph.types import Command
 from langchain_core.messages.utils import (
     trim_messages,
     count_tokens_approximately
@@ -132,17 +133,37 @@ async def generate_report_plan(state: State, config: RunnableConfig) -> dict:
     msg = await llm_with_tools.ainvoke(
         [{"role": "system", "content": sys}, *msgs],
     )
-    return {"messages": [msg]}
+
+    report_topic = ""
+    report_high_level_objectives = ""
+    if hasattr(msg, "tool_calls"):
+        tool_calls = msg.tool_calls
+        if tool_calls:
+            tool_call = tool_calls[0]
+            report_plan = tool_call.get("args", {})
+            if not isinstance(report_plan, dict): 
+                raise ValueError(
+                    "Report plan is not a dictionary"
+                )
+            report_topic = report_plan.get("report_topic", "")
+            report_high_level_objectives = report_plan.get("report_high_level_objectives", "")
+    
+    return {
+        "messages": [msg], 
+        "report_topic": report_topic, 
+        "report_high_level_objectives": report_high_level_objectives
+    }
 
 
-def deep_research_router(state: State) -> str:
+def deep_research_router(state: State) -> str | list[Send]:
     msg = state.messages[-1]
     if msg.tool_calls:
-        return _trigger_deep_research(state)
+        sends = _prepare_research_topics(state)
+        return sends
     return "END"
 
 
-def _trigger_deep_research(state: State) -> list[Send]:
+def _prepare_research_topics(state: State) -> list[Send]:
     msg = state.messages[-1]
     research_plan = msg.tool_calls[0].get("args", None)
     
@@ -155,9 +176,6 @@ def _trigger_deep_research(state: State) -> list[Send]:
     
     if not all([report_topic, report_high_level_objectives, report_structure]):
         raise ValueError("Missing required fields in research plan")
-    
-    state.report_topic = report_topic
-    state.report_high_level_objectives = report_high_level_objectives
 
     sends = [
         Send(
