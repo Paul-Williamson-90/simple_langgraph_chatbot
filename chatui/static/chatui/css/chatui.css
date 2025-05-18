@@ -93,6 +93,79 @@ body {
     word-break: break-word;
 }
 
+/* Markdown styling */
+.message-box h1,
+.message-box h2,
+.message-box h3,
+.message-box h4,
+.message-box h5,
+.message-box h6 {
+    color: #23395d;
+    margin: 0.5em 0 0.3em 0;
+    font-family: 'Nunito', 'Quicksand', Arial, sans-serif;
+    font-weight: 700;
+}
+
+.message-box p {
+    margin: 0.4em 0;
+}
+
+.message-box ul,
+.message-box ol {
+    margin: 0.4em 0 0.4em 1.2em;
+    padding-left: 1.2em;
+}
+
+.message-box li {
+    margin: 0.2em 0;
+}
+
+.message-box code {
+    background: #e0e7ef;
+    color: #2d3a4e;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.98em;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+}
+
+.message-box pre {
+    background: #e0e7ef;
+    color: #2d3a4e;
+    border-radius: 10px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    margin: 0.6em 0;
+    font-size: 0.98em;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+}
+
+.message-box blockquote {
+    border-left: 4px solid #b3d8f7;
+    background: #f5faff;
+    color: #23395d;
+    margin: 0.5em 0;
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    font-style: italic;
+}
+
+.message-box a {
+    color: #4a90e2;
+    text-decoration: underline;
+    word-break: break-all;
+}
+
+.message-box strong {
+    font-weight: 700;
+    color: #1a2a40;
+}
+
+.message-box em {
+    font-style: italic;
+    color: #23395d;
+}
+
 .message-human {
     align-self: flex-start;
     background: #dbeafe;

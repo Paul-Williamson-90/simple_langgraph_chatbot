@@ -41,7 +41,8 @@ function loadMessages(threadId) {
                 } else {
                     div.classList.add('message-ai');
                 }
-                div.textContent = msg.content;
+                // Render markdown as HTML
+                div.innerHTML = marked.parse(msg.content || "");
                 chat.appendChild(div);
             });
             chat.scrollTop = chat.scrollHeight;
@@ -95,7 +96,8 @@ function sendMessage() {
             } else {
                 div.classList.add('message-ai');
             }
-            div.textContent = msg.content;
+            // Render markdown as HTML
+            div.innerHTML = marked.parse(msg.content || "");
             chat.appendChild(div);
         });
         chat.scrollTop = chat.scrollHeight;
