@@ -6,6 +6,7 @@ from langchain_core.runnables import RunnableConfig
 from langchain.chat_models import init_chat_model
 from langgraph.types import Command
 from langchain_core.messages import AIMessage, ToolMessage
+from langgraph.pregel import RetryPolicy
 
 from src.agent.deep_research.state import SectionState, SectionOutputState
 from src.tools import agent_tool_kit
@@ -146,10 +147,10 @@ async def complete_section_step(state: SectionState, config: RunnableConfig) -> 
     
 deep_researcher_build = StateGraph(SectionState, output=SectionOutputState, config_schema=Configuration)
 
-deep_researcher_build.add_node("reasoning_step", reasoning_step)
-deep_researcher_build.add_node("tool_selection_step", tool_selection_step)
-deep_researcher_build.add_node("complete_section_step", complete_section_step)
-deep_researcher_build.add_node("tools", tool_node)
+deep_researcher_build.add_node("reasoning_step", reasoning_step, retry=RetryPolicy())
+deep_researcher_build.add_node("tool_selection_step", tool_selection_step, retry=RetryPolicy())
+deep_researcher_build.add_node("complete_section_step", complete_section_step, retry=RetryPolicy())
+deep_researcher_build.add_node("tools", tool_node, retry=RetryPolicy())
 
 deep_researcher_build.add_edge(START, "reasoning_step")
 deep_researcher_build.add_edge("reasoning_step", "tool_selection_step")
