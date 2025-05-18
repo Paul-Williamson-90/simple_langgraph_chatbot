@@ -42,6 +42,24 @@ def get_assistant_id_by_graph_id(graph_id: str) -> str:
     return assistant_id
 
 
+def get_historic_threads(limit: int = 10) -> list[dict[str, str]]:
+    client = get_sync_client(
+        url=AGENT_URL, 
+        api_key=settings.langsmith_api_key
+    )
+    threads = client.threads.search(
+        limit=limit,
+    )
+    return [
+        {
+            "thread_id": t["thread_id"],
+            "created_at": t["created_at"],
+            "updated_at": t["updated_at"],
+        } 
+        for t in threads
+    ]
+
+
 def get_new_thread_id() -> str:
     """
     Create a new thread ID for a new chat session.
@@ -136,7 +154,7 @@ def create_and_wait_run(
         raise Exception(f"Failed to create and wait for run for thread ID: {thread_id}")
     return run
 
-
+print(get_historic_threads())
 
 """
 Example usage:

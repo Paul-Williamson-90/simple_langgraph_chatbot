@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LangGraph Agent Chat</title>
+    <link rel="stylesheet" href="{% static 'chatui/css/chatui.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:400,700|Nunito:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="chatui-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button id="new-chat-btn" class="new-chat-btn">+ Start New Chat</button>
+            </div>
+            <ul id="thread-list" class="thread-list">
+                <!-- Thread items will be dynamically loaded here -->
+            </ul>
+        </aside>
+        <main class="chat-main">
+            <div id="chat-messages" class="chat-messages">
+                <!-- Chat messages will be dynamically loaded here -->
+            </div>
+            <div class="chat-input-bar">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Type your message..." autocomplete="off">
+                <button id="send-btn" class="send-btn">Send</button>
+                <label class="toggle-container">
+                    <input type="checkbox" id="deep-research-toggle">
+                    <span class="toggle-slider"></span>
+                    Deep Research
+                </label>
+            </div>
+        </main>
+    </div>
+    <script src="{% static 'chatui/js/chatui.js' %}"></script>
+</body>
+</html>

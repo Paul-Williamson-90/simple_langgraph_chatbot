@@ -17,6 +17,7 @@ dependencies = [
     "bbc-news (>=1.0.2,<2.0.0)",
     "bs4 (>=0.0.2,<0.0.3)",
     "pymupdf (>=1.25.5,<2.0.0)",
+    "django (>=5.2.1,<6.0.0)",
 ]
 
 [tool.poetry]
