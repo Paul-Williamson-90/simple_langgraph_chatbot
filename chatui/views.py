@@ -9,20 +9,20 @@ def chat_page(request):
     """
     return render(request, "chatui/chat.html")
 
-def get_threads(request):
+async def get_threads(request):
     """
     Return a list of historic threads as JSON.
     """
     from src.frontend.queries import get_historic_threads
-    threads = get_historic_threads(limit=20)
+    threads = await get_historic_threads(limit=20)
     return JsonResponse({"threads": threads})
 
-def get_thread_messages(request, thread_id):
+async def get_thread_messages(request, thread_id):
     """
     Return messages for a given thread_id as JSON.
     """
     from src.frontend.queries import get_thread_by_id
-    thread = get_thread_by_id(thread_id)
+    thread = await get_thread_by_id(thread_id)
     messages = []
     if thread.values and thread.values.messages:
         for msg in thread.values.messages:
@@ -34,7 +34,7 @@ def get_thread_messages(request, thread_id):
     return JsonResponse({"messages": messages})
 
 @csrf_exempt
-def send_message(request):
+async def send_message(request):
     """
     Send a message to the agent, creating a thread if needed.
     Expects JSON: {thread_id, message, deep_research}
@@ -52,10 +52,10 @@ def send_message(request):
     deep_research = data.get("deep_research", False)
 
     if not thread_id:
-        thread_id = get_new_thread_id()
-    assistant_id = get_assistant_id_by_graph_id(settings.graph_id)
+        thread_id = await get_new_thread_id()
+    assistant_id = await get_assistant_id_by_graph_id(settings.graph_id)
     configurables = ThreadConfigurables(deep_research=deep_research)
-    output = create_and_wait_run(
+    output = await create_and_wait_run(
         thread_id=thread_id,
         assistant_id=assistant_id,
         input={"messages": [HumanMessage(content=message)]},

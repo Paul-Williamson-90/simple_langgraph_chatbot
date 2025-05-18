@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from langgraph_sdk import get_sync_client
+from langgraph_sdk import get_client
 from langgraph_sdk.schema import Config
 
 from src.frontend.settings import settings
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 AGENT_URL = settings.agent_url
 
 
-def get_assistant_id_by_graph_id(graph_id: str) -> str:
+async def get_assistant_id_by_graph_id(graph_id: str) -> str:
     """
     Get the assistant ID by graph ID.
 
@@ -27,11 +27,11 @@ def get_assistant_id_by_graph_id(graph_id: str) -> str:
     str
         The assistant ID associated with the graph ID.
     """
-    client = get_sync_client(
-        url=AGENT_URL, 
+    client = get_client(
+        url=AGENT_URL,
         api_key=settings.langsmith_api_key
     )
-    assistants = client.assistants.search(graph_id=graph_id)
+    assistants = await client.assistants.search(graph_id=graph_id)
     if not assistants:
         logger.error(f"No assistants found for graph ID: {graph_id}")
         raise Exception(f"No assistants found for graph ID: {graph_id}")
@@ -42,12 +42,12 @@ def get_assistant_id_by_graph_id(graph_id: str) -> str:
     return assistant_id
 
 
-def get_historic_threads(limit: int = 10) -> list[dict[str, str]]:
-    client = get_sync_client(
-        url=AGENT_URL, 
+async def get_historic_threads(limit: int = 10) -> list[dict[str, str]]:
+    client = get_client(
+        url=AGENT_URL,
         api_key=settings.langsmith_api_key
     )
-    threads = client.threads.search(
+    threads = await client.threads.search(
         limit=limit,
     )
     return [
@@ -55,12 +55,12 @@ def get_historic_threads(limit: int = 10) -> list[dict[str, str]]:
             "thread_id": t["thread_id"],
             "created_at": t["created_at"],
             "updated_at": t["updated_at"],
-        } 
+        }
         for t in threads
     ]
 
 
-def get_new_thread_id() -> str:
+async def get_new_thread_id() -> str:
     """
     Create a new thread ID for a new chat session.
 
@@ -69,12 +69,12 @@ def get_new_thread_id() -> str:
     str
         The thread ID for the new chat session.
     """
-    client = get_sync_client(
-        url=AGENT_URL, 
+    client = get_client(
+        url=AGENT_URL,
         api_key=settings.langsmith_api_key
     )
-    thread_config = client.threads.create(
-        graph_id=settings.graph_id, 
+    thread_config = await client.threads.create(
+        graph_id=settings.graph_id,
     )
     thread_id = thread_config.get("thread_id", None)
     if thread_id is None:
@@ -83,7 +83,7 @@ def get_new_thread_id() -> str:
     return thread_id
 
 
-def get_thread_by_id(thread_id: str) -> Thread:
+async def get_thread_by_id(thread_id: str) -> Thread:
     """
     Get a thread by its ID.
     This allows access to historic messages in a thread.
@@ -99,28 +99,30 @@ def get_thread_by_id(thread_id: str) -> Thread:
     Thread
         The thread object associated with the thread ID.
     """
-    client = get_sync_client(
-        url=AGENT_URL, 
+    client = get_client(
+        url=AGENT_URL,
         api_key=settings.langsmith_api_key
     )
-    thread = client.threads.get(thread_id=thread_id)
+    thread = await client.threads.get(thread_id=thread_id)
     if thread is None:
         logger.error(f"Failed to get thread with ID: {thread_id}")
         raise Exception(f"Failed to get thread with ID: {thread_id}")
     return Thread(**thread)
 
 
-def create_and_wait_run(
+import asyncio
+
+async def create_and_wait_run(
     thread_id: str,
     assistant_id: str,
     input: dict[str, Any],
     configurables: ThreadConfigurables = ThreadConfigurables(),
 ) -> list[dict] | dict[str, Any]:
     """
-    Send a message to a thread and wait for a response.
+    Send a message to a thread and wait for a response (async).
     The output is a json dict with a messages key that contains a list of messages.
     This is the main function for sending messages to the assistant.
-    
+
     Parameters
     ----------
     thread_id : str
@@ -131,17 +133,17 @@ def create_and_wait_run(
         The input message to send to the assistant.
     configurables : ThreadConfigurables
         The configurables to use for the assistant.
-        
+
     Returns
     -------
     str
         The response from the assistant.
     """
-    client = get_sync_client(
-        url=AGENT_URL, 
+    client = get_client(
+        url=AGENT_URL,
         api_key=settings.langsmith_api_key
     )
-    run = client.runs.wait(
+    run = await client.runs.wait(
         thread_id=thread_id,
         assistant_id=assistant_id,
         input=input,

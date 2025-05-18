@@ -30,4 +30,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Run migrations and start server
-CMD ["sh", "-c", "python manage.py migrate && gunicorn langgraphweb.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate && uvicorn langgraphweb.asgi:application --host 0.0.0.0 --port 8000"]
