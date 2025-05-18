@@ -16,7 +16,7 @@ dependencies = [
     "pydantic (>=2.11.4,<3.0.0)",
     "bbc-news (>=1.0.2,<2.0.0)",
     "bs4 (>=0.0.2,<0.0.3)",
-    "pymupdf (>=1.25.5,<2.0.0)"
+    "pymupdf (>=1.25.5,<2.0.0)",
 ]
 
 [tool.poetry]

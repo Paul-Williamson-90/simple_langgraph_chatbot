@@ -4,8 +4,8 @@ from typing import Any
 from langgraph_sdk import get_sync_client
 from langgraph_sdk.schema import Config
 
-from src.streamlit.settings import settings
-from src.streamlit.pydantics import Thread, ThreadConfigurables
+from src.frontend.settings import settings
+from src.frontend.pydantics import Thread, ThreadConfigurables
 
 logger = logging.getLogger(__name__)
 
