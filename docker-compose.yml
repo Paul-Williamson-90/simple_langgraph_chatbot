@@ -10,7 +10,6 @@ services:
             timeout: 1s
             retries: 5
     langgraph-postgres:
-        # image: postgres:16
         image: ankane/pgvector:latest
         ports:
             - "5433:5432"
