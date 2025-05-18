@@ -30,7 +30,8 @@ tool_selection_instructions = (
     "2. Tool Selection Step: "
     "\n\t- In this step, you will use your reflections to select the most appropriate tools for your research. "
     "\n\t- There are the following tools available to you:"
-    "\n\t- {tools_available}\n\n"
+    "\n\t- {tools_available}"
+    "\n\t- If you decide you are ready to move to the writing step, you can do so by not selecting any tools. "
 )
 
 
