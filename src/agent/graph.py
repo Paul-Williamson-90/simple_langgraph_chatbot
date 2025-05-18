@@ -92,13 +92,6 @@ async def call_model(state: State, config: RunnableConfig) -> Command[Literal[EN
     )
 
 
-# def route_message(state: State) -> str:
-#     msg = state.internal_messages[-1]
-#     if msg.tool_calls:
-#         return "tools"
-#     return Command(goto="END", update={"messages": [msg]})
-
-
 def route_start(state: State, config: RunnableConfig) -> str:
     configuration = Configuration.from_runnable_config(config)
     if configuration.deep_research is True:
@@ -308,18 +301,7 @@ graph_builder.add_conditional_edges(
     route_start,
     {"call_model": "call_model", "generate_report_plan": "generate_report_plan"}
 )
-# graph_builder.add_conditional_edges(
-#     "call_model",
-#     route_message,
-#     {"tools": "tools", "END": END}
-# )
 graph_builder.add_edge("tools", "call_model")
-
-# graph_builder.add_conditional_edges(
-#     "generate_report_plan", 
-#     deep_research_router,
-#     {"END": END, "build_section": "build_section"}
-# )
 graph_builder.add_edge("build_section", "write_conclusion")
 graph_builder.add_edge("write_conclusion", "write_intro")
 graph_builder.add_edge("write_intro", "compile_final_report")
