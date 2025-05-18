@@ -41,8 +41,15 @@ function loadMessages(threadId) {
                 } else {
                     div.classList.add('message-ai');
                 }
+                // Add signifier badge
+                const badge = document.createElement('span');
+                badge.className = 'message-signifier';
+                badge.textContent = msg.type === 'human' ? 'Human' : 'AI';
+                div.appendChild(badge);
                 // Render markdown as HTML
-                div.innerHTML = marked.parse(msg.content || "");
+                const contentDiv = document.createElement('span');
+                contentDiv.innerHTML = marked.parse(msg.content || "");
+                div.appendChild(contentDiv);
                 chat.appendChild(div);
             });
             chat.scrollTop = chat.scrollHeight;
@@ -71,6 +78,8 @@ function sendMessage() {
     input.value = '';
     input.disabled = true;
     document.getElementById('send-btn').disabled = true;
+    // Show spinner
+    document.getElementById('loading-spinner').style.display = 'flex';
 
     fetch('/chat/api/send/', {
         method: 'POST',
@@ -96,8 +105,15 @@ function sendMessage() {
             } else {
                 div.classList.add('message-ai');
             }
+            // Add signifier badge
+            const badge = document.createElement('span');
+            badge.className = 'message-signifier';
+            badge.textContent = msg.type === 'human' ? 'Human' : 'AI';
+            div.appendChild(badge);
             // Render markdown as HTML
-            div.innerHTML = marked.parse(msg.content || "");
+            const contentDiv = document.createElement('span');
+            contentDiv.innerHTML = marked.parse(msg.content || "");
+            div.appendChild(contentDiv);
             chat.appendChild(div);
         });
         chat.scrollTop = chat.scrollHeight;
@@ -106,6 +122,8 @@ function sendMessage() {
     .finally(() => {
         input.disabled = false;
         document.getElementById('send-btn').disabled = false;
+        // Hide spinner
+        document.getElementById('loading-spinner').style.display = 'none';
         input.focus();
     });
 }
