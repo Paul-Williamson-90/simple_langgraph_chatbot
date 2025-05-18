@@ -8,6 +8,7 @@ class Section(BaseModel):
     name: str
     description: str
     research_objectives: list[str]
+    content_to_use: list[str]
 
 
 class Source(BaseModel):
@@ -56,5 +57,6 @@ class Brief(BaseModel):
             f"Section Topic: {self.section.name}\n"
             f"Section Description: {self.section.description}\n"
             f"Section Research Objectives: {self.section.research_objectives}\n"
+            f"Section Sources to Use: {self.section.content_to_use}\n"
         )
         return text

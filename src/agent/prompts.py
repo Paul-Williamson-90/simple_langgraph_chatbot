@@ -43,6 +43,8 @@ Each section should be clearly defined and have a distinct purpose, using the fo
 - Name: Name for this section of the report.
 - Description: Brief overview of the main topics covered in this section.
 - Research Objectives: Concepts / topics / questions that need to be researched to provide the evidence for this section.
+- Content to use: An optional list of existing sources that should be used to provide the evidence for this section.
+    - For example, this could be a list of URLs that should be used.
 
 **Note that intro and conclusion sections are NOT to be included in the report structure plan as these will be written last after the \
 research has been completed.**
