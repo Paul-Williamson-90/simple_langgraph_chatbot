@@ -4,8 +4,8 @@ from typing import Any
 from langgraph_sdk import get_client
 from langgraph_sdk.schema import Config
 
-from src.frontend.settings import settings
-from src.frontend.pydantics import Thread, ThreadConfigurables
+from src.utils.settings import settings
+from src.utils.pydantics import Thread, ThreadConfigurables
 
 logger = logging.getLogger(__name__)
 
