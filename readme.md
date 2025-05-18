@@ -66,3 +66,8 @@ make agent_stop
 ```bash
 make agent_restart
 ```
+
+## Frontend Chat UI
+- There is also a very basic frontend chat UI that has been created.
+- To access this, navigate to: [Chat UI](http://localhost:8000/chat/)
+- I cannot take any credit for the frontend as it is completely *'vibe coded'*
