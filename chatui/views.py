@@ -13,7 +13,7 @@ async def get_threads(request):
     """
     Return a list of historic threads as JSON.
     """
-    from src.utils.queries import get_historic_threads
+    from langgraphweb.utils.queries import get_historic_threads
     threads = await get_historic_threads(limit=20)
     return JsonResponse({"threads": threads})
 
@@ -21,7 +21,7 @@ async def get_thread_messages(request, thread_id):
     """
     Return messages for a given thread_id as JSON.
     """
-    from src.utils.queries import get_thread_by_id
+    from langgraphweb.utils.queries import get_thread_by_id
     thread = await get_thread_by_id(thread_id)
     messages = []
     if thread.values and thread.values.messages:
@@ -39,11 +39,11 @@ async def send_message(request):
     Send a message to the agent, creating a thread if needed.
     Expects JSON: {thread_id, message, deep_research}
     """
-    from src.utils.queries import (
+    from langgraphweb.utils.queries import (
         get_new_thread_id, get_assistant_id_by_graph_id, create_and_wait_run
     )
-    from src.utils.settings import settings
-    from src.utils.pydantics import ThreadConfigurables
+    from langgraphweb.utils.settings import settings
+    from langgraphweb.utils.pydantics import ThreadConfigurables
     from langchain_core.messages import HumanMessage
 
     data = json.loads(request.body.decode("utf-8"))
