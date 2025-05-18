@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 import json
 
 from pydantic import BaseModel
 from langchain.chat_models import init_chat_model
+from langgraph.types import Command
 from langchain_core.language_models import BaseChatModel
 from langgraph.graph import START, END, StateGraph
 from langchain_core.runnables import RunnableConfig
@@ -13,6 +14,7 @@ from langchain_core.messages.utils import (
     trim_messages,
     count_tokens_approximately
 )
+from langgraph.pregel import RetryPolicy
 
 from src.agent.state import State, InputState
 from src.tools import agent_tool_kit
@@ -46,10 +48,14 @@ def model_max_tokens(llm: BaseChatModel) -> Optional[int]:
         if tokens:
             break
     return tokens
-            
 
 
-async def call_model(state: State, config: RunnableConfig) -> dict:
+async def start_node(state: State, config: RunnableConfig) -> dict:
+    last_message = state.messages[-1]
+    return {"internal_messages": [last_message]}
+
+
+async def call_model(state: State, config: RunnableConfig) -> Command[Literal[END, "tools"]]:
     configuration = Configuration.from_runnable_config(config)
     llm = init_chat_model(
         model=configuration.model, 
@@ -62,7 +68,7 @@ async def call_model(state: State, config: RunnableConfig) -> dict:
     )
     max_tokens = (model_max_tokens(llm) or 128_000) - 1000
     msgs = trim_messages(
-        state.messages,
+        state.internal_messages,
         strategy="last",
         token_counter=count_tokens_approximately,
         max_tokens=max_tokens,
@@ -72,14 +78,18 @@ async def call_model(state: State, config: RunnableConfig) -> dict:
     msg = await llm_with_tools.ainvoke(
         [{"role": "system", "content": sys}, *msgs],
     )
-    return {"messages": [msg]}
-
-
-def route_message(state: State) -> str:
-    msg = state.messages[-1]
     if msg.tool_calls:
-        return "tools"
-    return "END"
+        return Command(
+            goto="tools",
+            update={"internal_messages": [msg]},
+        )
+    return Command(
+        goto=END,
+        update={
+            "messages": [msg], 
+            "internal_messages": [msg]
+        },
+    )
 
 
 def route_start(state: State, config: RunnableConfig) -> str:
@@ -90,7 +100,7 @@ def route_start(state: State, config: RunnableConfig) -> str:
 
 
 async def tool_node(state: State, config: RunnableConfig) -> dict:
-    if messages := state.messages:
+    if messages := state.internal_messages:
         message = messages[-1]
     else:
         raise ValueError("No message found in input")
@@ -109,10 +119,10 @@ async def tool_node(state: State, config: RunnableConfig) -> dict:
                 tool_call_id=tool_call["id"],
             )
         )
-    return {"messages": outputs}
+    return {"internal_messages": outputs}
 
 
-async def generate_report_plan(state: State, config: RunnableConfig) -> dict:
+async def generate_report_plan(state: State, config: RunnableConfig) -> Command[Literal[END, "trigger_build"]]:
     configuration = Configuration.from_runnable_config(config)
     llm = init_chat_model(
         model=configuration.model, 
@@ -122,7 +132,7 @@ async def generate_report_plan(state: State, config: RunnableConfig) -> dict:
     sys = report_planner_instructions
     max_tokens = (model_max_tokens(llm) or 128_000) - 1000
     msgs = trim_messages(
-        state.messages,
+        state.internal_messages,
         strategy="last",
         token_counter=count_tokens_approximately,
         max_tokens=max_tokens,
@@ -146,24 +156,40 @@ async def generate_report_plan(state: State, config: RunnableConfig) -> dict:
                 )
             report_topic = report_plan.get("report_topic", "")
             report_high_level_objectives = report_plan.get("report_high_level_objectives", "")
-    
-    return {
-        "messages": [msg], 
-        "report_topic": report_topic, 
-        "report_high_level_objectives": report_high_level_objectives
-    }
+            
+    if msg.tool_calls:
+        return Command(
+            goto="trigger_build",
+            update={
+                "internal_messages": [msg], 
+                "report_topic": report_topic, 
+                "report_high_level_objectives": report_high_level_objectives
+            },
+        )
+    return Command(
+        goto=END,
+        update={
+            "messages": [msg], 
+            "internal_messages": [msg], 
+            "report_topic": report_topic, 
+            "report_high_level_objectives": report_high_level_objectives
+        },
+    )
 
 
-def deep_research_router(state: State) -> str | list[Send]:
-    msg = state.messages[-1]
+def trigger_build(state: State) -> Command[Literal["build_section"]]:
+    msg = state.internal_messages[-1]
     if msg.tool_calls:
         sends = _prepare_research_topics(state)
-        return sends
-    return "END"
+        return Command(goto=sends)
+    else:
+        raise ValueError(
+            "No tool calls found in message"
+        )
 
 
 def _prepare_research_topics(state: State) -> list[Send]:
-    msg = state.messages[-1]
+    msg = state.internal_messages[-1]
     research_plan = msg.tool_calls[0].get("args", None)
     
     if not research_plan:
@@ -254,36 +280,28 @@ async def compile_final_report(state: State, config: RunnableConfig) -> dict:
     msg = AIMessage(
         content=f"# {state.report_topic.title()}\n{report_content}"
     )
-    return {"messages": [msg]}
+    return {"messages": [msg], "internal_messages": [msg]}
 
 
 graph_builder = StateGraph(State, input=InputState, config_schema=Configuration)
 
-graph_builder.add_node("call_model", call_model)
-graph_builder.add_node("tools", tool_node)
-graph_builder.add_node("generate_report_plan", generate_report_plan)
+graph_builder.add_node("start_node", start_node, retry=RetryPolicy())
+graph_builder.add_node("call_model", call_model, retry=RetryPolicy())
+graph_builder.add_node("tools", tool_node, retry=RetryPolicy())
+graph_builder.add_node("generate_report_plan", generate_report_plan, retry=RetryPolicy())
+graph_builder.add_node("trigger_build", trigger_build, retry=RetryPolicy())
 graph_builder.add_node("build_section", deep_researcher_build.compile(debug=True))
-graph_builder.add_node("compile_final_report", compile_final_report)
-graph_builder.add_node("write_conclusion", write_conclusion)
-graph_builder.add_node("write_intro", write_intro)
+graph_builder.add_node("compile_final_report", compile_final_report, retry=RetryPolicy())
+graph_builder.add_node("write_conclusion", write_conclusion, retry=RetryPolicy())
+graph_builder.add_node("write_intro", write_intro, retry=RetryPolicy())
 
+graph_builder.add_edge(START, "start_node")
 graph_builder.add_conditional_edges(
-    START,
+    "start_node",
     route_start,
     {"call_model": "call_model", "generate_report_plan": "generate_report_plan"}
 )
-graph_builder.add_conditional_edges(
-    "call_model",
-    route_message,
-    {"tools": "tools", "END": END}
-)
 graph_builder.add_edge("tools", "call_model")
-
-graph_builder.add_conditional_edges(
-    "generate_report_plan", 
-    deep_research_router,
-    {"END": END, "build_section": "build_section"}
-)
 graph_builder.add_edge("build_section", "write_conclusion")
 graph_builder.add_edge("write_conclusion", "write_intro")
 graph_builder.add_edge("write_intro", "compile_final_report")

@@ -10,7 +10,6 @@ services:
             timeout: 1s
             retries: 5
     langgraph-postgres:
-        # image: postgres:16
         image: ankane/pgvector:latest
         ports:
             - "5433:5432"
@@ -41,3 +40,24 @@ services:
             REDIS_URI: redis://langgraph-redis:6379
             LANGSMITH_API_KEY: ${LANGSMITH_API_KEY}
             POSTGRES_URI: postgres://postgres:postgres@langgraph-postgres:5432/postgres?sslmode=disable
+
+    langgraph-frontend:
+        build: .
+        container_name: langgraph-frontend
+        ports:
+            - "8000:8000"
+        depends_on:
+            langgraph-postgres:
+                condition: service_healthy
+            langgraph-api:
+                condition: service_started
+            langgraph-redis:
+                condition: service_healthy
+        env_file:
+            - .env
+        environment:
+            POSTGRES_HOST: langgraph-postgres
+            POSTGRES_PORT: 5432
+            AGENT_URL: http://langgraph-api:8000
+            # Add any other required env vars for Django/frontend here
+        restart: unless-stopped

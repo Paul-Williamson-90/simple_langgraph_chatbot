@@ -13,6 +13,7 @@ class State:
     """Main graph state."""
 
     messages: Annotated[list[AnyMessage], add_messages]
+    internal_messages: Annotated[list[AnyMessage], add_messages]
     """The messages in the conversation."""
     completed_sections: Annotated[list[CompletedSection], add] = field(default_factory=list)
     report_topic: str = ""
