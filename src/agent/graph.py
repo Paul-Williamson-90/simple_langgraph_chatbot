@@ -18,12 +18,6 @@ from langgraph.pregel import RetryPolicy
 
 from src.agent.state import State, InputState
 from src.tools import agent_tool_kit
-from src.agent.prompts import (
-    system_prompt, 
-    report_planner_instructions, 
-    report_conclusion_instructions,
-    report_intro_instructions
-)
 from src.agent.config import Configuration
 from src.agent.deep_research.graph import deep_researcher_build
 from src.agent.deep_research.plan_tool import submit_research_report_plan
@@ -63,7 +57,7 @@ async def call_model(state: State, config: RunnableConfig) -> Command[Literal[EN
     )
     llm_with_tools = llm.bind_tools(agent_tool_kit)
     
-    sys = system_prompt.format(
+    sys = configuration.system_prompt.format(
         time=datetime.now().isoformat()
     )
     max_tokens = (model_max_tokens(llm) or 128_000) - 1000
@@ -129,7 +123,7 @@ async def generate_report_plan(state: State, config: RunnableConfig) -> Command[
         model_provider=configuration.model_provider
     )
     llm_with_tools = llm.bind_tools([submit_research_report_plan])
-    sys = report_planner_instructions
+    sys = configuration.report_planner_instructions
     max_tokens = (model_max_tokens(llm) or 128_000) - 1000
     msgs = trim_messages(
         state.internal_messages,
@@ -230,7 +224,7 @@ async def write_conclusion(state: State, config: RunnableConfig) -> dict:
     completed_sections = state.completed_sections
     completed_sections.sort(key=lambda x: x.section_index)
     completed_report_sections = format_sections(completed_sections)
-    sys = report_conclusion_instructions.format(
+    sys = configuration.report_conclusion_instructions.format(
         completed_report_sections="\n".join(completed_report_sections),
         brief=brief_from_state(state),
     )
@@ -256,7 +250,7 @@ async def write_intro(state: State, config: RunnableConfig) -> dict:
     completed_sections = state.completed_sections
     completed_sections.sort(key=lambda x: x.section_index)
     completed_report_sections = format_sections(completed_sections)
-    sys = report_intro_instructions.format(
+    sys = configuration.report_intro_instructions.format(
         completed_report_sections="\n".join(completed_report_sections),
         brief=brief_from_state(state),
     )

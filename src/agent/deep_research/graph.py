@@ -12,7 +12,6 @@ from src.agent.deep_research.state import SectionState, SectionOutputState
 from src.tools import agent_tool_kit
 from src.agent.deep_research.pydantics import CompletedSection, Brief, Section
 from src.agent.config import Configuration
-from src.agent.deep_research.prompts import system_instruction
 
 
 def brief_from_state(state: SectionState) -> str:
@@ -26,7 +25,11 @@ def brief_from_state(state: SectionState) -> str:
     return str(brief)
 
 
-def _get_system_instruction(state: SectionState, current_step: str) -> str:
+def _get_system_instruction(
+    state: SectionState, 
+    configuration: Configuration,
+    current_step: str
+) -> str:
     tools_available = [
         {
             "tool_name": tool.name,
@@ -34,7 +37,7 @@ def _get_system_instruction(state: SectionState, current_step: str) -> str:
         } for tool in agent_tool_kit
     ]
     brief = brief_from_state(state)
-    sys = system_instruction.format(
+    sys = configuration.deep_research_system_instruction.format(
         current_step=current_step,
         tools_available=json.dumps(tools_available, indent=2),
         brief=brief,
@@ -50,7 +53,9 @@ async def reasoning_step(state: SectionState, config: RunnableConfig) -> dict:
         model_provider=configuration.model_provider
     )
     sys = _get_system_instruction(
-        state=state, current_step="Reflection Step"
+        state=state, 
+        configuration=configuration, 
+        current_step="Reflection Step"
     )
     msgs = state.messages
     msg = await llm.ainvoke(
@@ -75,7 +80,9 @@ async def tool_selection_step(state: SectionState, config: RunnableConfig) -> di
     )
     llm_with_tools = llm.bind_tools(agent_tool_kit)
     sys = _get_system_instruction(
-        state=state, current_step="Tool Selection Step"
+        state=state, 
+        configuration=configuration,
+        current_step="Tool Selection Step"
     )
     msgs = state.messages
     msg = await llm_with_tools.ainvoke(
@@ -126,7 +133,9 @@ async def complete_section_step(state: SectionState, config: RunnableConfig) -> 
     )
     
     sys = _get_system_instruction(
-        state=state, current_step="Writing Step"
+        state=state, 
+        configuration=configuration,
+        current_step="Writing Step"
     )
     
     msgs = state.messages
